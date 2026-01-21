@@ -15,20 +15,7 @@ from pathlib import Path
 
     
 
-# pip install presidio-analyzer presidio-anonymizer
-from presidio_analyzer import AnalyzerEngine
-from presidio_anonymizer import AnonymizerEngine
 
-analyzer = AnalyzerEngine()
-anonymizer = AnonymizerEngine()
-
-def scrub_pii(text):
-    results = analyzer.analyze(text=text, language='en')
-    anonymized_result = anonymizer.anonymize(
-        text=text,
-        analyzer_results=results
-    )
-    return anonymized_result.text
 def save_uploaded_file(uploaded_file) -> Path:
         suffix = Path(uploaded_file.name).suffix
 
@@ -125,7 +112,6 @@ def initialize_rag_and_build_graph(file_path):
 def run_rag_query(rag_system, question):
     """Run a query on the RAG system"""
     try:
-        question = scrub_pii(question)
         if rag_system:
             result = rag_system.run(question)
             return result
