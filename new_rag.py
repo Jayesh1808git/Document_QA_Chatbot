@@ -42,6 +42,7 @@ def cleanup_old_file():
     st.session_state.uploaded = False
     st.session_state.rag_system = None
     st.session_state.llm=None
+    st.session_state.chat_history = []
     # Clear embeddings from vectorstore
     vector_store.clear_vectorstore()
     # Clear resource cache to allow re-initialization later
@@ -57,6 +58,7 @@ def delete_document():
         st.session_state.uploaded = False
         st.session_state.rag_system = None
         st.session_state.llm=None
+        st.session_state.chat_history = []
         # Clear embeddings from vectorstore
         vector_store.clear_vectorstore()
         # Clear resource cache to allow re-initialization later
@@ -69,6 +71,8 @@ def init_session_state():
         st.session_state.uploaded = False
     if "llm" not in st.session_state:
         st.session_state.llm = None
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
 
 
 vector_store = VectorStore()
@@ -180,12 +184,28 @@ def main():
                                 )
                         
                         st.caption(f"⏱️ Response time: {elapsed_time:.2f} seconds")
+                        
+                        # Store in chat history
+                        st.session_state.chat_history.append({
+                            'question': question,
+                            'answer': result['answer'],
+                            'time': elapsed_time
+                        })
     else:
         st.info("File not uploaded")
-
     
-
-    
+    # Display chat history at the end
+    if st.session_state.chat_history:
+        st.markdown("---")
+        st.markdown("### 📋 Chat History")
+        
+        for i, chat in enumerate(st.session_state.chat_history, 1):
+            with st.expander(f"Q{i}: {chat['question'][:50]}..."):
+                st.markdown("**Question:**")
+                st.write(chat['question'])
+                st.markdown("**Answer:**")
+                st.info(chat['answer'])
+                st.caption(f"⏱️ Response time: {chat['time']:.2f} seconds")
 
 if __name__ == "__main__":
     main()
