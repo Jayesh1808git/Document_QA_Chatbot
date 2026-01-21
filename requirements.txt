@@ -8,4 +8,5 @@ fastembed
 langchain-groq
 langchain-qdrant
 qdrant-client
-pypdf
+pypdf==5.2.0
+
